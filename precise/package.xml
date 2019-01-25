@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>precise</name>
+  <version>0.0.0</version>
+  <description>The precise package</description>
+
+  <author     email="isura@rabot.us">Isura Ranatunga</author>
+  <maintainer email="isura@rabot.us">Isura Ranatunga</maintainer>
+
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+</package>

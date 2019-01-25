@@ -1,0 +1,11 @@
+moveit_setup_assistant_config:
+  URDF:
+    package: precise_pavp6_support
+    relative_path: urdf/pavp6.xacro
+    xacro_args: "--inorder "
+  SRDF:
+    relative_path: config/precise_pavp6.srdf
+  CONFIG:
+    author_name: Isura Ranatunga
+    author_email: isura@rabot.us
+    generated_timestamp: 1547839401

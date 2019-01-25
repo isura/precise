@@ -1,0 +1,305 @@
+'
+' Software License Agreement (BSD License)
+'
+' Copyright (c) 2013, Yaskawa America, Inc.
+' Copyright (c) 2019, Rabot, Inc.
+' All rights reserved.
+'
+' Redistribution And use In binary form, With Or without modification,
+' Is permitted provided that the following conditions are met:
+'
+'       * Redistributions In binary form must reproduce the above copyright
+'       notice, this list of conditions And the following disclaimer In the
+'       documentation And/Or other materials provided With the distribution.
+'       * Neither the name of the Yaskawa America, Inc., nor the names
+'       of its contributors may be used To endorse Or promote products derived
+'       from this software without specific prior written permission.
+'
+' THIS SOFTWARE Is PROVIDED BY THE COPYRIGHT HOLDERS And CONTRIBUTORS "AS IS"
+' And ANY EXPRESS Or IMPLIED WARRANTIES, INCLUDING, BUT Not LIMITED To, THE
+' IMPLIED WARRANTIES OF MERCHANTABILITY And FITNESS For A PARTICULAR PURPOSE
+' ARE DISCLAIMED. In NO Event SHALL THE COPYRIGHT OWNER Or CONTRIBUTORS BE
+' LIABLE For ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, Or
+' CONSEQUENTIAL DAMAGES (INCLUDING, BUT Not LIMITED To, PROCUREMENT OF
+' SUBSTITUTE GOODS Or SERVICES; LOSS OF USE, DATA, Or PROFITS; Or BUSINESS
+' INTERRUPTION) HOWEVER CAUSED And On ANY THEORY OF LIABILITY, WHETHER In
+' CONTRACT, STRICT LIABILITY, Or TORT (INCLUDING NEGLIGENCE Or OTHERWISE)
+' ARISING In ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN If ADVISED OF THE
+' POSSIBILITY OF SUCH DAMAGE.
+'
+
+Module SimpleMessage
+
+    Public Const ROS_MAX_JOINT  As Integer = 10
+    Public Const MOT_MAX_GR     As Integer = 4
+    Public Const IS_BIG_ENDIAN  As Boolean = False ' False: little endian
+
+    Public Function ToBitStrInt(input As Integer) As String
+        Return ToBitString(input, Integer, IS_BIG_ENDIAN)
+    End Function
+
+    Public Function ToBitStrSng(input As Single) As String
+        Return ToBitString(input, Single, IS_BIG_ENDIAN)
+    End Function
+
+    Public Function ToBitStrIntVec(input(ROS_MAX_JOINT) As Integer) As String
+        Dim output As String
+        Dim idx    As Integer
+        For idx = 0 To input.Length - 1
+            output = output & ToBitStrInt(input(idx))
+        Next
+        Return output
+    End Function
+
+    Public Function ToBitStrSngVec(input(ROS_MAX_JOINT) As Single) As String
+        Dim output As String
+        Dim idx    As Integer
+        For idx = 0 To input.Length - 1
+            output = output & ToBitStrSng(input(idx))
+        Next
+        Return output
+    End Function
+	
+	Public Function FromBitStrInt(input As String) As Integer
+        Return FromBitString(input, Integer, IS_BIG_ENDIAN)
+    End Function
+
+    Public Function FromBitStrSng(input As String) As Single
+        Return FromBitString(input, Single, IS_BIG_ENDIAN)
+    End Function
+
+    ' Prefix Section
+
+    Public Class SmPrefix
+        Public Dim length As Integer
+        Public Function Serialize() As String
+            Return ToBitStrInt(length)
+        End Function
+    End Class
+
+    ' Header Section
+
+    ' Message Type Codes (from simple_message/simple_message.h)
+    Public Class SmMsgType
+
+        Public Const ROS_MSG_INVALID                      As Integer = 0
+        Public Const ROS_MSG_PING                         As Integer = 1
+
+        Public Const ROS_MSG_JOINT_POSITION               As Integer = 10
+        Public Const ROS_MSG_JOINT                        As Integer = 10
+        Public Const ROS_MSG_READ_INPUT                   As Integer = 20
+        Public Const ROS_MSG_WRITE_OUTPUT                 As Integer = 21
+
+        Public Const ROS_MSG_JOINT_TRAJ_PT                As Integer = 11  ' Joint trajectory point message (typically for streaming)
+        Public Const ROS_MSG_JOINT_TRAJ                   As Integer = 12  ' Joint trajectory message (typically for trajectory downloading)
+        Public Const ROS_MSG_STATUS                       As Integer = 13  ' Robot status message (for reporting the robot state)
+        Public Const ROS_MSG_JOINT_TRAJ_PT_FULL           As Integer = 14  ' Joint trajectory point message (all message fields)
+        Public Const ROS_MSG_JOINT_FEEDBACK               As Integer = 15  ' Feedback of joint pos/vel/accel
+
+        Public Dim type As Integer
+        Public Function Serialize() As String
+            Return ToBitStrInt(type)
+        End Function
+    End Class
+
+
+    Public Class SmCommType
+        Public Const ROS_COMM_INVALID                     As Integer = 0
+        Public Const ROS_COMM_TOPIC                       As Integer = 1
+        Public Const ROS_COMM_SERVICE_REQUEST             As Integer = 2
+        Public Const ROS_COMM_SERVICE_REPLY               As Integer = 3
+
+        Public Dim type As Integer
+        Public Function Serialize() As String
+            Return ToBitStrInt(type)
+        End Function
+    End Class
+
+
+    Public Class SmReplyType
+        Public Const ROS_REPLY_INVALID                    As Integer = 0
+        Public Const ROS_REPLY_SUCCESS                    As Integer = 1
+        Public Const ROS_REPLY_FAILURE                    As Integer = 2
+
+        Public Dim type As Integer
+        Public Function Serialize() As String
+            Return ToBitStrInt(type)
+        End Function
+    End Class
+
+
+    Public Class SmCommandType
+        Public Const ROS_CMD_CHECK_MOTION_READY           As Integer = 200101
+        Public Const ROS_CMD_CHECK_QUEUE_CNT              As Integer = 200102
+        Public Const ROS_CMD_STOP_MOTION                  As Integer = 200111
+        Public Const ROS_CMD_START_SERVOS                 As Integer = 200112 ' starts the servo motors
+        Public Const ROS_CMD_STOP_SERVOS                  As Integer = 200113 ' stops the servo motors And motion
+        Public Const ROS_CMD_RESET_ALARM                  As Integer = 200114 ' clears the Error In the current Controller
+        Public Const ROS_CMD_START_TRAJ_MODE              As Integer = 200121
+        Public Const ROS_CMD_STOP_TRAJ_MODE               As Integer = 200122
+        Public Const ROS_CMD_DISCONNECT                   As Integer = 200130
+
+        Public Dim type As Integer
+        Public Function Serialize() As String
+            Return ToBitStrInt(type)
+        End Function
+    End Class
+
+
+    Public Class SmResultType
+        Public Const ROS_RESULT_SUCCESS                   As Integer = 0
+        Public Const ROS_RESULT_TRUE                      As Integer = 0
+        Public Const ROS_RESULT_BUSY                      As Integer = 1
+        Public Const ROS_RESULT_FAILURE                   As Integer = 2
+        Public Const ROS_RESULT_FALSE                     As Integer = 2
+        Public Const ROS_RESULT_INVALID                   As Integer = 3
+        Public Const ROS_RESULT_ALARM                     As Integer = 4
+        Public Const ROS_RESULT_NOT_READY                 As Integer = 5
+        Public Const ROS_RESULT_MP_FAILURE                As Integer = 6
+
+        Public Dim type As Integer
+        Public Function Serialize() As String
+            Return ToBitStrInt(type)
+        End Function
+    End Class
+
+
+    Public Class SmInvalidSubCode
+        Public Const ROS_RESULT_INVALID_UNSPECIFIED       As Integer = 3000
+        Public Const ROS_RESULT_INVALID_MSGSIZE           As Integer = 3001
+        Public Const ROS_RESULT_INVALID_MSGHEADER         As Integer = 3002
+        Public Const ROS_RESULT_INVALID_MSGTYPE           As Integer = 3003
+        Public Const ROS_RESULT_INVALID_GROUPNO           As Integer = 3004
+        Public Const ROS_RESULT_INVALID_SEQUENCE          As Integer = 3005
+        Public Const ROS_RESULT_INVALID_COMMAND           As Integer = 3006
+        Public Const ROS_RESULT_INVALID_DATA              As Integer = 3010
+        Public Const ROS_RESULT_INVALID_DATA_START_POS    As Integer = 3011
+        Public Const ROS_RESULT_INVALID_DATA_POSITION     As Integer = 3012
+        Public Const ROS_RESULT_INVALID_DATA_SPEED        As Integer = 3013
+        Public Const ROS_RESULT_INVALID_DATA_ACCEL        As Integer = 3014
+        Public Const ROS_RESULT_INVALID_DATA_INSUFFICIENT As Integer = 3015
+
+        Public Dim code As Integer
+        Public Function Serialize() As String
+            Return ToBitStrInt(code)
+        End Function
+    End Class
+
+
+    Public Class SmNotReadySubcode
+        Public Const ROS_RESULT_NOT_READY_UNSPECIFIED     As Integer = 5000
+        Public Const ROS_RESULT_NOT_READY_ALARM           As Integer = 5001
+        Public Const ROS_RESULT_NOT_READY_ERROR           As Integer = 5002
+        Public Const ROS_RESULT_NOT_READY_ESTOP           As Integer = 5002
+        Public Const ROS_RESULT_NOT_READY_NOT_PLAY        As Integer = 5003
+        Public Const ROS_RESULT_NOT_READY_NOT_REMOTE      As Integer = 5004
+        Public Const ROS_RESULT_NOT_READY_SERVO_OFF       As Integer = 5005
+        Public Const ROS_RESULT_NOT_READY_HOLD            As Integer = 5006
+        Public Const ROS_RESULT_NOT_READY_NOT_STARTED     As Integer = 5007
+        Public Const ROS_RESULT_NOT_READY_WAITING_ROS     As Integer = 5008
+        Public Const ROS_RESULT_NOT_READY_SKILLSEND       As Integer = 5009
+
+        Public Dim code As Integer
+        Public Function Serialize() As String
+            Return ToBitStrInt(code)
+        End Function
+    End Class
+
+    Public Class SmHeader
+        Public Dim msgType                                As New SmMsgType
+        Public Dim commType                               As New SmCommType
+        Public Dim replyType                              As New SmReplyType
+
+		Public Function Serialize() As String
+			Return msgType.Serialize() & commType.Serialize() & replyType.Serialize()
+		End Function
+    End Class
+
+    Public Class FlagsValidFields
+        Public Const Valid_Time                           As Integer = 1
+        Public Const Valid_Position                       As Integer = 2
+        Public Const Valid_Velocity                       As Integer = 4
+        Public Const Valid_Acceleration                   As Integer = 8
+
+        Public Dim field As Integer
+        Public Function Serialize() As String
+            Return ToBitStrInt(field)
+        End Function
+    End Class
+
+    ' Body Section
+
+    Public Class SmBodyRobotStatus                                        ' ROS_MSG_ROBOT_STATUS = 13
+        Public Dim drives_powered                 As Integer              ' Servo Power: -1=Unknown, 1=On, 0=Off
+        Public Dim e_stopped                      As Integer              ' Controller E-Stop state: -1=Unknown, 1=True(On), 0=False(Off)
+        Public Dim error_code                     As Integer              ' Alarm code
+        Public Dim in_error                       As Integer              ' Is there an alarm:   -1=Unknown, 1=True, 0=False
+        Public Dim in_motion                      As Integer              ' Is currently executing a motion command:  -1=Unknown, 1=True, 0=False
+        Public Dim mode                           As Integer              ' Controller/Pendant mode: -1=Unknown, 1=Manual(TEACH), 2=Auto(PLAY)
+        Public Dim motion_possible                As Integer              ' Is the Controller ready To receive motion: -1=Unknown, 1=ENABLED, 0=DISABLED
+
+        Public Function Serialize() As String
+            Return ToBitStrInt(drives_powered) & ToBitStrInt(e_stopped) & ToBitStrInt(error_code) & ToBitStrInt(in_error) & ToBitStrInt(in_motion) & ToBitStrInt(mode) & ToBitStrInt(motion_possible)
+        End Function
+    End Class
+
+    Public Class SmBodyJointTrajPt                                        ' ROS_MSG_JOINT_TRAJ_PT = 11
+        Public Dim sequence                       As Integer              ' Index of point In trajectory; 0 = Initial trajectory point, which should match the Robot current position.
+        Public Dim joints(ROS_MAX_JOINT-1)        As Single               ' Desired joint positions In radian.  Base To Tool joint order
+        Public Dim velocity                       As Single               ' Desired joint velocity In radian/sec.
+        Public Dim duration                       As Single               ' Timestamp associated With this trajectory point; Units: In seconds
+
+        Public Function Serialize() As String
+            Return ToBitStrInt(sequence) & ToBitStrSngVec(joints) & ToBitStrSng(velocity) & ToBitStrSng(duration)
+        End Function
+    End Class
+
+    Public Class SmBodyJointTrajPtFull                                    ' ROS_MSG_JOINT_TRAJ_PT_FULL = 14
+        Public Dim robot_id                       As Integer              ' Robot/group ID;  0 = 1st Robot
+        Public Dim sequence                       As Integer              ' Index of point In trajectory; 0 = Initial trajectory point, which should match the Robot current position.
+        Public Dim valid_fields                   As New FlagsValidFields ' Bit-mask indicating which “Optional” fields are filled With data. 1=time, 2=position, 4=velocity, 8=acceleration
+        Public Dim time                           As Single               ' Timestamp associated With this trajectory point; Units: In seconds
+        Public Dim positions(ROS_MAX_JOINT-1)     As Single               ' Desired joint positions In radian.  Base To Tool joint order
+        Public Dim velocities(ROS_MAX_JOINT-1)    As Single               ' Desired joint velocities In radian/sec.
+        Public Dim accelerations(ROS_MAX_JOINT-1) As Single               ' Desired joint accelerations In radian/sec^2.
+
+        Public Function Serialize() As String
+            Dim output As String
+            output = ToBitStrInt(robot_id) & ToBitStrInt(sequence) & valid_fields.Serialize() & ToBitStrSng(time)
+            output = output & ToBitStrSngVec(positions) & ToBitStrSngVec(velocities) & ToBitStrSngVec(accelerations)
+            Return output
+        End Function
+    End Class
+
+    Public Class SmBodyJointPosition                                      ' ROS_MSG_JOINT_POSITION = 10
+        Public Dim sequence                       As Integer              ' Robot/group ID;  0 = 1st Robot
+        Public Dim joints(ROS_MAX_JOINT-1)        As Single               ' Feedback joint positions In radian.  Base To Tool joint order
+
+        Public Function Serialize() As String
+            Return ToBitStrInt(sequence) & ToBitStrSngVec(joints)
+        End Function
+    End Class
+
+    Public Class SmBodyJointFeedback                                      ' ROS_MSG_JOINT_FEEDBACK = 15
+        Public Dim robot_id                       As Integer              ' Robot/group ID;  0 = 1st Robot
+        Public Dim valid_fields                   As New FlagsValidFields ' Bit-mask indicating which “Optional” fields are filled With data. 1=time, 2=position, 4=velocity, 8=acceleration
+        Public Dim time                           As Single               ' Timestamp associated With this trajectory point; Units: In seconds
+        Public Dim positions(ROS_MAX_JOINT-1)     As Single               ' Feedback joint positions In radian.  Base To Tool joint order
+        Public Dim velocities(ROS_MAX_JOINT-1)    As Single               ' Feedback joint velocities In radian/sec.
+        Public Dim accelerations(ROS_MAX_JOINT-1) As Single               ' Feedback joint accelerations In radian/sec^2.
+
+        Public Function Serialize() As String
+            Dim output As String
+            output = ToBitStrInt(robot_id) & valid_fields.Serialize() & ToBitStrSng(time)
+            output = output & ToBitStrSngVec(positions) & ToBitStrSngVec(velocities) & ToBitStrSngVec(accelerations)
+            Return output
+        End Function
+    End Class
+
+    ' Function Section
+
+    ' int  Ros_SimpleMsg_JointFeedback(CtrlGroup* ctrlGroup, SimpleMsg* sendMsg)
+    ' int Ros_SimpleMsg_MotionReply(SimpleMsg* receiveMsg, int result, int subcode, SimpleMsg* replyMsg, int ctrlGrp)
+    ' int Ros_SimpleMsg_IoReply(int result, int subcode, SimpleMsg* replyMsg)
+
+End Module

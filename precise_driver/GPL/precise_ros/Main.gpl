@@ -1,0 +1,268 @@
+'
+' Software License Agreement (BSD License)
+'
+' Copyright (c) 2019, Rabot, Inc.
+' All rights reserved.
+'
+' Redistribution and use in source and binary forms, with or without
+' modification, are permitted provided that the following conditions
+' are met:
+'
+'  * Redistributions of source code must retain the above copyright
+'    notice, this list of conditions and the following disclaimer.
+'  * Redistributions in binary form must reproduce the above
+'    copyright notice, this list of conditions and the following
+'    disclaimer in the documentation and/or other materials provided
+'    with the distribution.
+'  * Neither the name of Rabot, Inc. nor the names of its contributors
+'    may be used to endorse or promote products derived from this
+'    software without specific prior written permission.
+'
+' THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+' "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+' LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+' FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+' COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+' INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+' BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+' LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+' CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+' LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+' ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+' POSSIBILITY OF SUCH DAMAGE.
+'
+
+Module GPL
+
+	' Simple Telnet-like TCP server, listening on port 10000 and 11000
+	' Echoes back whatever it receives
+
+    ' ROS Industrial Standard Socket Ports
+    ' MOTION = 11000, SYSTEM = 11001, STATE = 11002, IO = 11003
+
+    Dim motion_port As New IPEndPoint("", 11000) ' Accept from any IP
+    Dim system_port As New IPEndPoint("", 11001) ' Accept from any IP
+    Dim state_port  As New IPEndPoint("", 11002) ' Accept from any IP
+    Dim io_port     As New IPEndPoint("", 11003) ' Accept from any IP
+
+	Dim tl As New TcpListener(state_port)
+	Dim t2 As New TcpListener(motion_port)
+	Dim ts1 As Socket
+	Dim ts2 As Socket
+	Dim recv As String     
+	Dim send As String     
+	Dim ii As Integer
+	Dim lf As String = Chr(GPL_LF)
+	Dim cr As String = Chr(GPL_CR)
+	Dim ret As String = cr & lf
+	Dim ws As String = " "
+	Dim lf_pos As Integer
+	Dim ex As New Exception
+
+	Public Sub MAIN
+	
+		' wait till robot is powered on
+		Dim state As Integer
+		Do
+			Thread.Sleep(1000) ' wait 1 second
+			state = Controller.PowerState(0)
+		Loop While state < 11
+	
+		Dim thread1 As New Thread("RobotStatePub")
+		Dim thread2 As New Thread("RobotCommandSub")
+		
+		thread1.Start()
+		thread2.Start()
+	
+	End Sub
+	
+	Public Function DegToRad(angle As Single) As Single
+		Return angle*Math.PI/180
+	End Function
+	
+	Public Function RadToDeg(angle As Single) As Single
+		Return angle*180/Math.PI
+	End Function
+	
+	Public Sub RobotCommandSub()
+
+		Dim length As Integer
+		Dim loc As New Location
+		
+		Dim prof As New Profile
+		prof.Accel     = 90
+		prof.Decel     = 90
+		prof.AccelRamp = 0.1
+		prof.DecelRamp = 0.1
+		prof.InRange   = -1
+		prof.Speed     = 50
+		prof.Straight  = False
+		
+		Dim recv_arr() As String
+		
+		Robot.Attached = 1            ' Get control of robot #1
+		
+		While True
+		
+			Try
+				' Start listening and wait for a connection  
+				t2.Start()
+				While Not t2.Pending()
+					Thread.Sleep(500)
+				End While
+				Console.Writeline("Connection request...")     
+				ts2 = t2.AcceptSocket()        ' Get the socket     
+				t2.Stop()                      ' Only service one
+				
+				Console.Writeline("Connected!")   
+			
+				Dim RobotPos  As Location
+				While True
+					If ts2.Available > 0 Then
+						ts2.Receive(recv, 500)
+						If  recv = ret Then
+							Exit While
+						End If
+						
+						length = recv.Length
+						'Console.Writeline("Data Length: " & CStr(length))
+						
+						Dim joints(5) As Single
+						Dim velocity  As Single
+						Dim duration  As Single
+						
+						If length = 68 Then
+							
+							joints(0) = RadToDeg(FromBitStrSng(recv.Substring(20,4)))
+							joints(1) = RadToDeg(FromBitStrSng(recv.Substring(24,4)))
+							joints(2) = RadToDeg(FromBitStrSng(recv.Substring(28,4)))
+							joints(3) = RadToDeg(FromBitStrSng(recv.Substring(32,4)))
+							joints(4) = RadToDeg(FromBitStrSng(recv.Substring(36,4)))
+							joints(5) = RadToDeg(FromBitStrSng(recv.Substring(40,4)))
+							
+							velocity  = FromBitStrSng(recv.Substring(60,4))*100
+							duration  = FromBitStrSng(recv.Substring(64,4))
+							
+							'Console.Writeline("Vel: " & CStr(velocity))
+							'Console.Writeline("Duration: " & CStr(duration))
+							'Console.Writeline("Joints: " & CStr(joints(0)) & "," & CStr(joints(1)) & "," & CStr(joints(2)) & "," & CStr(joints(3)) & "," & CStr(joints(4)) & "," & CStr(joints(5)))
+						
+							loc.Angles(joints(0),joints(1),joints(2),joints(3),joints(4),joints(5))
+							prof.Speed = velocity
+							Move.Loc(loc, prof)
+							
+							' send reply
+
+							' SimpleMsg
+							Dim prefix As New SmPrefix
+							Dim header As New SmHeader
+							
+							prefix.length = header.Serialize().Length
+							header.msgType.type   = SmMsgType.ROS_MSG_JOINT_TRAJ_PT
+							header.commType.type  = SmCommType.ROS_COMM_SERVICE_REPLY
+							header.replyType.type = SmReplyType.ROS_REPLY_SUCCESS
+							
+		                    ' SimpleMsg
+							Dim msg As String = prefix.Serialize() & header.Serialize()
+							ts2.Send(msg)
+							
+						Else
+							send = "Wrong number of joint values: " & CStr(length)& " should be 6." & ret
+							ts2.Send(send)
+							Thread.Sleep(100)
+						End If
+					End If
+					
+				End While     
+				
+				Console.Writeline("Connection closed!")
+				ts2.Close()
+			
+			Catch ex
+                ' -- Output error to error log
+                Controller.SystemMessage(CStr(ex.ErrorCode) & " " & ex.Message _
+                          & " Robot:" & CStr(1))
+
+                Thread.Sleep(500)       ' Do not overload system
+
+            End Try
+			
+		End While
+		
+		Robot.Attached = 0             ' Release control of robot
+	
+	End Sub
+	
+	Public Sub RobotStatePub()
+	
+		While True
+			Try
+				' Start listening and wait for a connection  
+				tl.Start()
+				While Not tl.Pending()
+					Thread.Sleep(500)
+				End While
+				Console.Writeline("Connection request...")     
+				ts1 = tl.AcceptSocket()        ' Get the socket     
+				tl.Stop()                      ' Only service one
+			
+				Dim RobotPos  As Location
+				
+				While True
+					If ts1.Available > 0 Then
+						ts1.Receive(recv, 5)
+						If  recv = ret Then
+							Exit While
+						End If
+					End If
+					RobotPos =  Robot.WhereAngles()
+					
+					'Legacy
+					'send = "q:" & CStr(RobotPos.Angle(1)) & "," & CStr(RobotPos.Angle(2)) & "," & CStr(RobotPos.Angle(3)) & "," & CStr(RobotPos.Angle(4)) & "," & CStr(RobotPos.Angle(5)) & "," & CStr(RobotPos.Angle(6)) & ret
+					
+					' SimpleMsg
+					Dim prefix As New SmPrefix
+					Dim header As New SmHeader
+					Dim body   As New SmBodyJointPosition
+					
+					prefix.length = header.Serialize().Length + body.Serialize().Length
+					
+					header.msgType.type   = SmMsgType.ROS_MSG_JOINT_POSITION
+					header.commType.type  = SmCommType.ROS_COMM_TOPIC
+					header.replyType.type = SmReplyType.ROS_REPLY_INVALID
+					
+					body.sequence         = 0
+
+					body.joints(0) = DegToRad(RobotPos.Angle(1))
+					body.joints(1) = DegToRad(RobotPos.Angle(2))
+					body.joints(2) = DegToRad(RobotPos.Angle(3))
+					body.joints(3) = DegToRad(RobotPos.Angle(4))
+					body.joints(4) = DegToRad(RobotPos.Angle(5))
+					body.joints(5) = DegToRad(RobotPos.Angle(6))
+
+                    ' SimpleMsg
+					Dim msg As String = prefix.Serialize() & header.Serialize() & body.Serialize()
+		
+					ts1.Send(msg)
+					
+					Thread.Sleep(100)
+				End While
+				
+				Console.Writeline("Connection closed!")
+				ts1.Close()
+			
+			Catch ex
+                ' -- Output error to error log
+                Controller.SystemMessage(CStr(ex.ErrorCode) & " " & ex.Message _
+                          & " Robot:" & CStr(1))
+
+                ts1.Close()
+                Thread.Sleep(500)       ' Do not overload system
+
+            End Try
+			
+		End While
+		
+    End Sub
+	
+End Module

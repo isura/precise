@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+
+<robot name="precise_pavp6" xmlns:xacro="http://ros.org/wiki/xacro">
+	<xacro:include filename="$(find precise_pavp6_support)/urdf/pavp6_macro.xacro" />
+	<xacro:precise_pavp6 prefix=""/>
+</robot>
+
+

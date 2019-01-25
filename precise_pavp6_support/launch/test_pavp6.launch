@@ -1,0 +1,7 @@
+<launch>
+	<include file="$(find precise_pavp6_support)/launch/load_pavp6.launch" />
+	<param name="use_gui" value="true" />
+	<node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
+	<node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find precise_pavp6_support)/config/robot_state_visualize.rviz" required="true" />
+</launch>

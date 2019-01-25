@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>precise_driver</name>
+  <version>0.0.0</version>
+  <description>
+   <p>
+     ROS-Industrial nodes for interfacing with Precise Automation robot controllers.
+   </p>
+   <p>
+     This package is part of the ROS-Industrial program and contains nodes 
+     for interfacing with Precise Automation industrial robot controllers.
+   </p>
+  </description>
+
+  <author     email="isura@rabot.us">Isura Ranatunga</author>
+  <maintainer email="isura@rabot.us">Isura Ranatunga</maintainer>
+
+  <license>BSD</license>
+
+  <url type="website">http://ros.org/wiki/abb_driver</url>
+  <url type="bugtracker">https://github.com/ros-industrial/abb/issues</url>
+  <url type="repository">https://github.com/ros-industrial/abb</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <depend>industrial_robot_client</depend>
+
+</package>

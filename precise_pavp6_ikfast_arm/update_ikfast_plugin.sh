@@ -1,0 +1,1 @@
+rosrun moveit_kinematics create_ikfast_moveit_plugin.py precise_pavp6 arm precise_pavp6_ikfast_arm /home/isura/catkin_ws/src/precise/precise_pavp6_ikfast_arm/src/precise_pavp6_arm_ikfast_solver.cpp

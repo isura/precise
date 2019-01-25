@@ -1,0 +1,277 @@
+<?xml version="1.0" ?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+<xacro:macro name="precise_pavp6" params="prefix">
+
+    <!-- link list -->
+    <link name="${prefix}base_link">
+        <visual>
+		    <geometry>
+			    <mesh filename="package://precise_pavp6_support/meshes/visual/pavp6_base_link.dae" scale="1 1 1"/>
+		    </geometry>
+	    </visual>
+	    <collision>
+		    <geometry>
+			    <mesh filename="package://precise_pavp6_support/meshes/collision/pavp6_base_link.stl" scale="1 1 1"/>
+		    </geometry>
+	    </collision>
+	    <inertial>
+		    <mass value="1"/>
+		    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+		    <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+	    </inertial>
+	</link>
+    <link name="${prefix}link_1">
+	    <visual>
+		    <geometry>
+			    <mesh filename="package://precise_pavp6_support/meshes/visual/pavp6_link_1.dae" scale="1 1 1"/>
+		    </geometry>
+	    </visual>
+	    <collision>
+
+		    <geometry>
+			    <mesh filename="package://precise_pavp6_support/meshes/collision/pavp6_link_1.stl" scale="1 1 1"/>
+		    </geometry>
+	    </collision>
+	    <inertial>
+		    <mass value="1"/>
+		    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+		    <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+	    </inertial>
+	</link>
+    <link name="${prefix}link_2">
+		<visual>
+			<geometry>
+				<mesh filename="package://precise_pavp6_support/meshes/visual/pavp6_link_2.dae" scale="1 1 1"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="package://precise_pavp6_support/meshes/collision/pavp6_link_2.stl" scale="1 1 1"/>
+			</geometry>
+		</collision>
+		<inertial>
+			<mass value="1"/>
+			<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+			<inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+		</inertial>
+	</link>
+    <link name="${prefix}link_3">
+	    <visual>
+		    <geometry>
+			    <mesh filename="package://precise_pavp6_support/meshes/visual/pavp6_link_3.dae" scale="1 1 1"/>
+		    </geometry>
+	    </visual>
+	    <collision>
+		    <geometry>
+			    <mesh filename="package://precise_pavp6_support/meshes/collision/pavp6_link_3.stl" scale="1 1 1"/>
+		    </geometry>
+	    </collision>
+	    <inertial>
+		    <mass value="1"/>
+		    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+		    <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+	    </inertial>
+	</link>
+    <link name="${prefix}link_4">
+	    <visual>
+		    <geometry>
+			    <mesh filename="package://precise_pavp6_support/meshes/visual/pavp6_link_4.dae" scale="1 1 1"/>
+		    </geometry>
+	    </visual>
+	    <collision>
+		    <geometry>
+			    <mesh filename="package://precise_pavp6_support/meshes/collision/pavp6_link_4.stl" scale="1 1 1"/>
+		    </geometry>
+	    </collision>
+	    <inertial>
+		    <mass value="1"/>
+		    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+		    <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+	    </inertial>
+    </link>
+    <link name="${prefix}link_5">
+		<visual>
+			<geometry>
+				<mesh filename="package://precise_pavp6_support/meshes/visual/pavp6_link_5.dae" scale="1 1 1"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="package://precise_pavp6_support/meshes/collision/pavp6_link_5.stl" scale="1 1 1"/>
+			</geometry>
+		</collision>
+		<inertial>
+			<mass value="1"/>
+			<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+			<inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+		</inertial>
+	</link>
+    <link name="${prefix}link_6">
+		<visual>
+			<geometry>
+				<mesh filename="package://precise_pavp6_support/meshes/visual/pavp6_link_6.dae" scale="1 1 1"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="package://precise_pavp6_support/meshes/collision/pavp6_link_6.stl" scale="1 1 1"/>
+			</geometry>
+		</collision>
+		<inertial>
+			<mass value="1"/>
+			<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+			<inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+		</inertial>
+	</link>
+    <link name="${prefix}tool0"/>
+    <!-- end of link list -->
+
+    <!-- joint list -->
+	<joint name="${prefix}joint_1" type="revolute">
+		<parent link="${prefix}base_link"/>
+		<child link="${prefix}link_1"/>
+		<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.252"/>
+		<axis xyz="-0.0 -0.0 1.0"/>
+		<limit effort="1" lower="-2.792527" upper="2.792527" velocity="1"/>
+		<dynamics damping="0" friction="0"/>
+	</joint>
+	<transmission name="${prefix}trans_1">
+		<type>transmission_interface/SimpleTransmission</type>
+		<joint name="${prefix}joint_1">
+			<hardwareInterface>PositionJointInterface</hardwareInterface>
+		</joint>
+		<actuator name="${prefix}motor_1">
+			<hardwareInterface>PositionJointInterface</hardwareInterface>
+			<mechanicalReduction>1</mechanicalReduction>
+		</actuator>
+	</transmission>
+
+	<joint name="${prefix}joint_2" type="revolute">
+		<parent link="${prefix}link_1"/>
+		<child link="${prefix}link_2"/>
+		<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.124"/>
+		<axis xyz="-0.0 1.0 -0.0"/>
+		<limit effort="1" lower="-2.094395" upper="2.094395" velocity="1"/>
+		<dynamics damping="0" friction="0"/>
+	</joint>
+	<transmission name="${prefix}trans_2">
+		<type>transmission_interface/SimpleTransmission</type>
+		<joint name="${prefix}joint_2">
+			<hardwareInterface>PositionJointInterface</hardwareInterface>
+		</joint>
+		<actuator name="${prefix}motor_2">
+			<hardwareInterface>PositionJointInterface</hardwareInterface>
+			<mechanicalReduction>1</mechanicalReduction>
+		</actuator>
+	</transmission>
+
+	<joint name="${prefix}joint_3" type="revolute">
+		<parent link="${prefix}link_2"/>
+		<child link="${prefix}link_3"/>
+		<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.210000"/>
+		<axis xyz="-0.0 1.0 -0.0"/>
+		<limit effort="1" lower="0.3316126" upper="2.792527" velocity="1"/>
+		<dynamics damping="0" friction="0"/>
+	</joint>
+	<transmission name="${prefix}trans_3">
+		<type>transmission_interface/SimpleTransmission</type>
+		<joint name="${prefix}joint_3">
+			<hardwareInterface>PositionJointInterface</hardwareInterface>
+		</joint>
+		<actuator name="${prefix}motor_3">
+			<hardwareInterface>PositionJointInterface</hardwareInterface>
+			<mechanicalReduction>1</mechanicalReduction>
+		</actuator>
+	</transmission>
+
+	<joint name="${prefix}joint_4" type="revolute">
+		<parent link="${prefix}link_3"/>
+		<child link="${prefix}link_4"/>
+		<origin rpy="0.0 0.0 0.0" xyz="-0.075000 0.0 0.086"/>
+		<axis xyz="-0.0 -0.0 1.0"/>
+		<limit effort="1" lower="-2.792527" upper="2.792527" velocity="1"/>
+		<dynamics damping="0" friction="0"/>
+	</joint>
+	<transmission name="${prefix}trans_4">
+		<type>transmission_interface/SimpleTransmission</type>
+		<joint name="${prefix}joint_4">
+			<hardwareInterface>PositionJointInterface</hardwareInterface>
+		</joint>
+		<actuator name="${prefix}motor_4">
+			<hardwareInterface>PositionJointInterface</hardwareInterface>
+			<mechanicalReduction>1</mechanicalReduction>
+		</actuator>
+	</transmission>
+
+	<joint name="${prefix}joint_5" type="revolute">
+		<parent link="${prefix}link_4"/>
+		<child link="${prefix}link_5"/>
+		<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.124"/>
+		<axis xyz="0.0 1.0 0.0"/>
+		<limit effort="1" lower="-2.094395" upper="2.094395" velocity="1"/>
+		<dynamics damping="0" friction="0"/>
+	</joint>
+	<transmission name="${prefix}trans_5">
+		<type>transmission_interface/SimpleTransmission</type>
+		<joint name="${prefix}joint_5">
+			<hardwareInterface>PositionJointInterface</hardwareInterface>
+		</joint>
+		<actuator name="${prefix}motor_5">
+			<hardwareInterface>PositionJointInterface</hardwareInterface>
+			<mechanicalReduction>1</mechanicalReduction>
+		</actuator>
+	</transmission>
+
+	<joint name="${prefix}joint_6" type="revolute">
+		<parent link="${prefix}link_5"/>
+		<child link="${prefix}link_6"/>
+		<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.064"/>
+		<axis xyz="-0.0 0.0 1.000000"/>
+		<!--limit effort="1" lower="-6.283185" upper="6.283185" velocity="1"/-->
+        <limit effort="1" lower="-3.14" upper="3.14" velocity="1"/>
+		<dynamics damping="0" friction="0"/>
+	</joint>
+	<transmission name="${prefix}trans_6">
+		<type>transmission_interface/SimpleTransmission</type>
+		<joint name="${prefix}joint_6">
+			<hardwareInterface>PositionJointInterface</hardwareInterface>
+		</joint>
+		<actuator name="${prefix}motor_6">
+			<hardwareInterface>PositionJointInterface</hardwareInterface>
+			<mechanicalReduction>1</mechanicalReduction>
+		</actuator>
+	</transmission>
+   
+    <joint name="${prefix}joint_6-tool0" type="fixed">
+        <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.006"/>
+        <parent link="${prefix}link_6"/>
+        <child link="${prefix}tool0"/>
+    </joint>
+    <!-- end of joint list -->
+
+    <!-- gazebo config -->
+    <gazebo>
+        <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+            <robotNamespace>/</robotNamespace>
+        </plugin>
+    </gazebo>
+    <!-- end gazebo config -->
+    
+    <!-- ROS base_link to Robot Manufacturer World Coordinates transform -->
+    <link name="${prefix}base" />
+    <joint name="${prefix}base_link-base" type="fixed">
+        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+        <parent link="${prefix}base_link"/>
+        <child link="${prefix}base"/>
+    </joint>
+
+    <link name="world" />
+    <joint name="world_joint" type="fixed">
+        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+        <parent link="world" />
+        <child link = "base_link" />
+    </joint>
+
+    </xacro:macro>
+</robot>
+

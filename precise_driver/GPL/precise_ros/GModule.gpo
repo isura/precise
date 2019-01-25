@@ -1,0 +1,34 @@
+'GPL Generated Code.  Please do not manually edit
+'Created: 12/14/2018 6:07:00 AM
+'
+Module GModule
+  Public prof0 As Profile
+  Public prof1 As Profile
+
+  Public Sub Init
+    '<MotionProfile>prof0
+    prof0 = New Profile
+    prof0.Speed = 100
+    prof0.Speed2 = 0
+    prof0.Accel = 90
+    prof0.Decel = 90
+    prof0.AccelRamp = 0.1
+    prof0.DecelRamp = 0.1
+    prof0.Straight = False
+    prof0.InRange = -1
+    '</MotionProfile>
+
+    '<MotionProfile>prof1
+    prof1 = New Profile
+    prof1.Speed = 100
+    prof1.Speed2 = 0
+    prof1.Accel = 90
+    prof1.Decel = 90
+    prof1.AccelRamp = 0.1
+    prof1.DecelRamp = 0.1
+    prof1.Straight = False
+    prof1.InRange = 100
+    '</MotionProfile>
+
+  End Sub 
+End Module 

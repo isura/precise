@@ -1,0 +1,7 @@
+ProjectBegin
+ProjectName="precise_ros"
+ProjectStart="Main"
+ProjectSource="Main.gpl"
+ProjectSource="GModule.gpo"
+ProjectSource="SimpleMessage.gpl"
+ProjectEnd

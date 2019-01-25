@@ -1,0 +1,23 @@
+<!--
+  Manipulator specific version of the state visualizer.
+
+  Defaults provided for pavp6:
+   - 6 joints
+
+  Usage:
+    robot_state_visualize_pavp6.launch robot_ip:=<value>
+-->
+<launch>
+  <arg name="robot_ip" doc="IP of the controller" />
+
+    <!-- Load URDF -->
+    <include file="$(find precise_pavp6_support)/launch/load_pavp6.launch" />
+    <rosparam command="load" file="$(find precise_pavp6_support)/config/joint_names_pavp6.yaml" />
+
+    <!-- Required nodes -->
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
+
+
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find precise_pavp6_support)/config/robot_state_visualize.rviz" required="true" />
+
+</launch>

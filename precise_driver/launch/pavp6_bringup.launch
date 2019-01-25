@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!--
+  Precise Automation PAVP6 launch.  Loads PAVP6 robot description and starts driver.
+
+  Usage:
+    pavp6_bringup.launch robot_ip:=<value>
+-->
+<launch>
+
+  <!-- robot_ip: IP-address of the robot's socket-messaging server -->
+  <arg name="robot_ip" default="192.168.1.100" doc="IP of controller" />
+  
+  <!-- copy the specified IP address to the Parameter Server, for use by nodes below -->
+  <param name="/robot_ip_address" type="str" value="$(arg robot_ip)"/>
+
+  <!-- Load URDF -->
+  <include file="$(find precise_pavp6_support)/launch/load_pavp6.launch" />
+  <rosparam command="load" file="$(find precise_pavp6_support)/config/joint_names_pavp6.yaml" />
+  
+  <!-- robot_state: publishes joint positions and robot-state data
+                   (from socket connection to robot) -->
+  <node pkg="precise_driver" type="precise_robot_state" name="robot_state"/>
+  
+  <!-- motion_streaming_interface: sends robot motion commands by STREAMING path to robot
+                                  (using socket connection to robot) -->
+  <node pkg="precise_driver" type="precise_motion_streaming_interface" name="motion_streaming_interface"/>
+  
+  <!-- joint_trajectory_action: provides actionlib interface for high-level robot control -->
+  <node pkg="precise_driver" type="precise_joint_trajectory_action" name="joint_trajectory_action"/>
+
+</launch>
